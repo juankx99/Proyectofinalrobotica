@@ -1,0 +1,14 @@
+# Proyecto final - Mision autonoma
+# Waypoints en el frame del mapa (metros, yaw en radianes).
+# Todos estan a mas de 0.6 m de paredes y obstaculos del mundo casa.sdf.
+mission:
+  frame_id: map
+  initial_pose: {x: 0.0, y: 0.0, yaw: 0.0}   # pose inicial que se le da a AMCL
+  wait_at_waypoint: 1.0                       # pausa en cada waypoint [s]
+  loop: false                                 # repetir la mision indefinidamente
+  waypoints:
+    - {name: "Sala sur",                 x:  2.5, y: -1.5, yaw:  0.00}
+    - {name: "Frente al estante",        x:  1.5, y:  2.3, yaw:  1.57}
+    - {name: "Cuarto superior izquierdo", x: -3.0, y:  2.6, yaw:  3.14}
+    - {name: "Cuarto inferior izquierdo", x: -4.8, y: -1.6, yaw: -1.57}
+    - {name: "Regreso al inicio",        x:  0.0, y:  0.0, yaw:  0.00}

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+  Version liviana del robot del profesor (basic_dif_bot_description) para
+  correr SLAM / AMCL / Nav2 en WSL2 sin saturar la CPU:
+    - Reutiliza la geometria, inercias, sensores (frames) y friccion originales.
+    - Quita la camara de profundidad (no se usa en navegacion 2D).
+    - Lidar a 10 Hz con frame lidar_link.
+    - use_ros2_control:=false (por defecto) -> plugin DiffDrive de Gazebo
+      use_ros2_control:=true                 -> gz_ros2_control + diff_drive_controller
+-->
+<robot name="dif_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:arg name="use_ros2_control" default="false"/>
+  <!-- Desviacion estandar del ruido gaussiano del lidar [m] -->
+  <xacro:arg name="lidar_noise" default="0.01"/>
+
+  <!-- Geometria y frames del robot original (incluye sensors.xacro) -->
+  <xacro:include filename="$(find basic_dif_bot_description)/urdf/robot.urdf.xacro"/>
+
+  <!-- Friccion de ruedas y caster del original -->
+  <xacro:include filename="$(find basic_dif_bot_description)/urdf/gz_physics.xacro"/>
+
+  <!-- Sensores de Gazebo (IMU + lidar, sin camara) -->
+  <xacro:include filename="$(find dif_bot_nav)/urdf/gz_sensors_lite.xacro"/>
+
+  <xacro:if value="$(arg use_ros2_control)">
+    <xacro:include filename="$(find basic_dif_bot_description)/urdf/ros2_control.xacro"/>
+    <xacro:ros2_control_block/>
+    <gazebo>
+      <plugin filename="gz_ros2_control-system"
+              name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <parameters>$(find dif_bot_nav)/config/diff_drive_controllers.yaml</parameters>
+      </plugin>
+    </gazebo>
+  </xacro:if>
+
+  <xacro:unless value="$(arg use_ros2_control)">
+    <xacro:include filename="$(find dif_bot_nav)/urdf/gz_diffdrive_lite.xacro"/>
+  </xacro:unless>
+
+</robot>
